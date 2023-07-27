@@ -1,0 +1,4 @@
+server_ip:xx.xxx.xxx.xxx
+port:xxxx
+backup_server:xx.xxx.xxx.xxx
+backup_port:xx.xxx.xxx.xxx
