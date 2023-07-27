@@ -1,4 +1,4 @@
-server_ip:xx.xxx.xxx.xxx
+server_ip:xx.xxx.xxx.xxx ## Example file please make a version named Server_data.txt with this information as formatted here
 port:xxxx
 backup_server:xx.xxx.xxx.xxx
 backup_port:xx.xxx.xxx.xxx
