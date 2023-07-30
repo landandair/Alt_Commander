@@ -2,7 +2,7 @@ import pickle
 import socket
 import _thread as thread
 import time
-from Decicion_Maker import ServerData
+from Server_Client_Data import ServerData
 import sys
 from cryptography.fernet import Fernet
 

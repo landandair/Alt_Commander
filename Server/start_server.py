@@ -1,5 +1,5 @@
 from Server import main
-from Decicion_Maker import ServerData
+from Server_Client_Data import ServerData
 
 
 if __name__ == '__main__':
