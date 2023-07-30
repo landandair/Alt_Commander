@@ -23,13 +23,23 @@ class Network:
             self.addr = (socket.gethostname(), int(port))  # Change to IP
         else:
             self.addr = (ip, int(port))  # Change to IP
-        self.start = self.connect()
+
+        # Get reference image from server
+        data = self.connect()
+        self.corner_pos = data['corner']
+        print(self.corner_pos)
+        num_packets = data['pkt_num']
+        with open('template_img.png', 'wb') as fi:
+            for _ in range(num_packets):
+                self.client.send(self.fernet.encrypt(b'1'))
+                data = self.client.recv(2048)
+                fi.write(self.fernet.decrypt(data))
 
     def connect(self):
         try:
             print(f'Trying to connect to {self.addr}')
             self.client.connect(self.addr)
-            data = pickle.loads(self.fernet.decrypt(self.client.recv(5 * 2048)))
+            data = pickle.loads(self.fernet.decrypt(self.client.recv(2048)))
             return data
         except socket.error as e:
             print(e)

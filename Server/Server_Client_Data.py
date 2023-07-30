@@ -11,6 +11,7 @@ class ServerData:
         self.bad_blocks = []
         self.update_blocks = []
         self.bot_positions = {}
+        self.file_name = file_name
         img = Image.open(file_name)
         self.get_image_coordinates(img, ignored_color)
 

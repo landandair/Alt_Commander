@@ -38,48 +38,71 @@ def main(server_data):
 
 
 def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
-    given_priority_target = False
-    low_priority_target = server_data.get_oldest_update()
-    # Initial behavior send starting position
-    initial = {'pos': (server_data.get_oldest_update())}  # Send starting position
-    encoded = fernet.encrypt(pickle.dumps(initial, protocol=-1))  # Package data
-    conn.send(encoded)  # Send initial packet
-
-
-    while True:
-        try:
-            data = conn.recv(2048)
-            if not data:
-                print(f"Player {peer_name} Disconnected")
-                server_data.bot_positions.pop(peer_name)
-                break
-            data = pickle.loads(fernet.decrypt(data))
-            # Use data to update server data and send essential updates back to client
-            server_data.bot_positions[peer_name] = data['pos']
-            if data['pos'] == low_priority_target:  # Target has been reached need new target
-                low_priority_target = server_data.get_oldest_update()
-
-            # Logic to assign a priority target (bad pixel) when a bot is ready
-            if data['pix_ready'] and not given_priority_target:
-                data['target'] = server_data.nearest_bad_block(peer_name)
-                given_priority_target = True
-                if not data['target']:
-                    data['target'] = low_priority_target  # This will make send the bot aimlessly waiting for
-                    given_priority_target = False
+    try:
+        given_priority_target = False
+        low_priority_target = server_data.get_oldest_update()
+        # Initial behavior send starting position
+        img_packets = []
+        with open(server_data.file_name, 'rb') as fi:
+            buffer = fi.read(1024)
+            while buffer:
+                img_packets.append(buffer)
+                buffer = fi.read(1024)
+        initial = {'pkt_num': len(img_packets), 'corner': server_data.corner_pos}  # Send number of img packets
+        encoded = fernet.encrypt(pickle.dumps(initial, protocol=-1))  # Package data
+        conn.send(encoded)  # Send initial packet
+        img_sent = True
+        for buffer in img_packets:
+            check = fernet.decrypt(conn.recv(2048))
+            if int(check):
+                encoded = fernet.encrypt(buffer)
+                conn.send(encoded)
             else:
-                data['target'] = low_priority_target  # This will make send the bot aimlessly searching
-                given_priority_target = False
+                img_sent = False
+                print(f'{peer_name}: Image Sending Failed')
+                break
+        # Image Finished sending
 
-            # Look through bad blocks
+        while img_sent:
+            try:
+                data = conn.recv(2048)
+                if not data:
+                    if peer_name in server_data.bot_positions:
+                        server_data.bot_positions.pop(peer_name)
+                    break
+                data = pickle.loads(fernet.decrypt(data))
+                # Use data to update server data and send essential updates back to client
+                server_data.bot_positions[peer_name] = data['pos']
+                if data['pos'] == data['target']:  # Target has been reached need new target
+                    if given_priority_target:
+                        given_priority_target = False
+                    else:
+                        low_priority_target = server_data.get_oldest_update()
+
+                # Logic to assign a priority target (bad pixel) when a bot is ready
+                if data['pix_ready'] and not given_priority_target:
+                    data['target'] = server_data.nearest_bad_block(peer_name)
+                    given_priority_target = True
+                    if not data['target']:
+                        data['target'] = low_priority_target  # This will make send the bot aimlessly waiting for
+                        given_priority_target = False
+                elif not given_priority_target:
+                    data['target'] = low_priority_target  # This will make send the bot aimlessly searching
+                    given_priority_target = False
+
+                # Look through bad blocks
 
 
-            encoded = fernet.encrypt(pickle.dumps(data, protocol=-1))
-            conn.send(encoded)
-            # print("Sent : ", data, player)
-        except socket.error as e:
-            print(e)
-            break
-    time.sleep(5)
+                encoded = fernet.encrypt(pickle.dumps(data, protocol=-1))
+                conn.send(encoded)
+                # print("Sent : ", data, player)
+            except socket.error as e:
+                print(e)
+                break
+    except KeyboardInterrupt:
+        pass
+
+    time.sleep(1)
     print(f"Lost connection to:{peer_name}")
     conn.close()
 
