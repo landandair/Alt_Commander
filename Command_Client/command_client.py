@@ -27,7 +27,7 @@ class CmdNetwork:
         # Get reference image from server
         data = self.connect()
         self.corner_pos = data['corner']
-        print(self.corner_pos)
+        print(f'Image being received with a top left corner of: {self.corner_pos}')
         num_packets = data['pkt_num']
         with open('template_img.png', 'wb') as fi:
             for _ in range(num_packets):
@@ -61,6 +61,6 @@ if __name__ == '__main__':
         time.sleep(1)
         data = {'goto_range': (),
                 'shuffle': False,
-                'move': (),
+                'moves': (),
                 'reboot': False}
         print(network.send(data))

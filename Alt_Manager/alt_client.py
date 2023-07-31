@@ -27,7 +27,7 @@ class Network:
         # Get reference image from server
         data = self.connect()
         self.corner_pos = data['corner']
-        print(self.corner_pos)
+        print(f'Image being received with a top left corner of: {self.corner_pos}')
         num_packets = data['pkt_num']
         with open('template_img.png', 'wb') as fi:
             for _ in range(num_packets):
