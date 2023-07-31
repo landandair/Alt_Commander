@@ -1,7 +1,15 @@
-import PIL
-import selenium
+import os
+import time
+from PIL import Image
+from selenium import webdriver
+from selenium.webdriver.common import action_chains
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import random
 
-class RPlaceBot:
+class SwarmPlaceBot:
     interval = .3
     code_to_button = {'0,0': (72, 443),
                       '0,1': (116, 443),
