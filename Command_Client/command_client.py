@@ -56,12 +56,11 @@ class CmdNetwork:
 
 if __name__ == '__main__':
     # debug code which sends working data and was used to develop com protocol
-    network = Network(local_mode=True)
+    network = CmdNetwork(local_mode=True)
     while True:
         time.sleep(1)
-        data = {'pos': (0, 0),
-                'target': (0, 1),
-                'bad_blocks': [],
-                'pix_ready': False,
+        data = {'goto_range': (),
+                'shuffle': False,
+                'move': (),
                 'reboot': False}
         print(network.send(data))

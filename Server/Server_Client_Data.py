@@ -1,4 +1,5 @@
 from PIL import Image
+import random
 
 class ServerData:
     def __init__(self, file_name, corner_pos, ignored_color=(125, 230, 242)):
@@ -14,6 +15,7 @@ class ServerData:
         self.file_name = file_name
         img = Image.open(file_name)
         self.get_image_coordinates(img, ignored_color)
+        self.shuffle()
 
     def nearest_bad_block(self, bot_name):
         bot_pos = self.bot_positions[bot_name]
@@ -45,4 +47,7 @@ class ServerData:
                 color = img.getpixel((x, y))
                 if color != ignored:
                     self.update_blocks.append((x, y))
+
+    def shuffle(self):
+        random.shuffle(self.update_blocks)
 
