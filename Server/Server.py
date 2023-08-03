@@ -89,8 +89,8 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
                 if given_priority_target:
                     given_priority_target = False
                 else:
+                    print(f'{peer_name}: {low_priority_target}')  # REMOVE
                     low_priority_target = server_data.get_oldest_update()
-
             # Logic to assign a priority target (bad pixel) when a bot is ready
             if data['pix_ready'] and not given_priority_target:
                 data['target'] = server_data.nearest_bad_block(peer_name)
