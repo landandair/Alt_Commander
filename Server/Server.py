@@ -4,7 +4,7 @@ import _thread as thread
 import time
 from Server_Client_Data import ServerData
 import sys
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 
 def main(server_data):
     try:
@@ -33,6 +33,7 @@ def main(server_data):
     while True:  # Main connection loop which listens and creates threads that handle communications with clients
         conn, addr = s.accept()
         print("Connected to:", addr)
+        print(f'{len(server_data.bot_positions)+1} bots connected')
         # Start thread to manage player
         thread.start_new_thread(threaded_client, (conn, conn.getpeername(), fernet, server_data))
 
@@ -50,15 +51,20 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
         encoded = fernet.encrypt(pickle.dumps(initial, protocol=-1))  # Package data
         conn.send(encoded)  # Send initial packet
         img_sent = True
-        for buffer in img_packets:
-            check = fernet.decrypt(conn.recv(2048))
-            if int(check):
-                encoded = fernet.encrypt(buffer)
-                conn.send(encoded)
-            else:
-                img_sent = False
-                print(f'{peer_name}: Image Sending Failed')
-                break
+        try:
+            for buffer in img_packets:
+                check = fernet.decrypt(conn.recv(2048))
+                if int(check):
+                    encoded = fernet.encrypt(buffer)
+                    conn.send(encoded)
+                else:
+                    img_sent = False
+                    print(f'{peer_name}: Image Sending Failed')
+                    break
+        except InvalidToken:
+            print(f'{peer_name} has wrong key')
+            raise KeyboardInterrupt
+
         # Image Finished sending
         # Process alt_clients
         if int(check) == 1:
@@ -89,7 +95,7 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
                 if given_priority_target:
                     given_priority_target = False
                 else:
-                    print(f'{peer_name}: {low_priority_target}')  # REMOVE
+                    # print(f'{peer_name}: {low_priority_target}')  # REMOVE
                     low_priority_target = server_data.get_oldest_update()
             # Logic to assign a priority target (bad pixel) when a bot is ready
             if data['pix_ready'] and not given_priority_target:

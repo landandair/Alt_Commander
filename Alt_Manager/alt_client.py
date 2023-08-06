@@ -2,6 +2,8 @@ import time
 import socket
 import pickle
 import sys
+
+import cryptography.fernet
 from cryptography.fernet import Fernet
 
 
@@ -40,6 +42,7 @@ class Network:
             print(f'Trying to connect to {self.addr}')
             self.client.connect(self.addr)
             data = pickle.loads(self.fernet.decrypt(self.client.recv(2048)))
+            print('Success')
             return data
         except socket.error as e:
             print(e)
@@ -49,9 +52,15 @@ class Network:
         try:
             self.client.send(self.fernet.encrypt(pickle.dumps(data, protocol=-1)))
             data = self.client.recv(2048)
-            return pickle.loads(self.fernet.decrypt(data))
+            if data:
+                return pickle.loads(self.fernet.decrypt(data))
+            else:
+                print('Lost Connection to server')
+                sys.exit()
         except socket.error as e:
             print(e)
+        except cryptography.fernet.InvalidToken:
+            sys.exit('Invalid key from server (Server Closed)')
 
 
 if __name__ == '__main__':

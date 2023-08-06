@@ -7,13 +7,16 @@ from threading import Thread
 def main():
     local = True
     fake_client = True
+    account_info = 'Account_Info.txt'
+    if fake_client and False:
+        account_info = 'Example_Account_Info.txt'
     info = [True]
-    allowed_fails = 3
+    allowed_fails = 10  # -1 means infinite restarts (Not recommended)
     processes = []
-    with open('Account_Info.txt') as fi:
+    with open(account_info) as fi:
         line = fi.readline()
         while line:
-            if line[0] != '#':
+            if line[0] != '#' and line != '\n':
                 print('Starting')
                 user, pwd = line.split(' ')
                 inputs = (user, pwd, info, local, fake_client)
@@ -27,13 +30,14 @@ def main():
             time.sleep(1)
             for i, process_list in enumerate(processes):
                 process, inputs, health = process_list
-                if not process.is_alive() and health > 0:
+                if not process.is_alive() and health != 0:
+                    time.sleep(5)
                     health -= 1
                     print(f'Restarting {inputs[0]}: {health} restarts remaining')
                     process = Thread(target=manage_individual_client, args=inputs)
                     process.start()
                     processes[i] = [process, inputs, health]
-                elif not process.is_alive() and health < 1:
+                elif not process.is_alive() and health == 0:
                     info[0] = False
                     sys.exit(f'{inputs[0]} Ran out of restarts, something wend wrong')
 
@@ -54,14 +58,14 @@ def manage_individual_client(username, password, info, local=False, fake_client=
             time.sleep(3)  # Waiting till client is ready for next move
             alt_interface.update()
             if alt_interface.client_dat['reboot']:
-                alt_interface = bot_obj(username, password, net_client)
+                print('Server-Triggered Reboot')
+                sys.exit()
         except BrokenPipeError:
             print(f'{username} Lost Connection to Server')
             break
         except KeyboardInterrupt:
             sys.exit(f'{username} interrupted by user')
     # bot_interface.SwarmPlaceBot(username, password)
-
 
 if __name__ == '__main__':
     main()
