@@ -13,10 +13,10 @@ Game/interface for Operating smarter bots for R/Place in a semi or fully-autonom
       5. click- py launcher and for all users
       6. click- next
 3. Download the project files from github and unzip to the desired location
-4. open command line(command prompt) and type 'python --version' or try 'py --version'
+4. Open command line(command prompt) and type 'python --version' or try 'py --version'
    1. You should see your python version u downloaded 
    2. if not look up how to change your default version
-5. while in terminal/console/command prompt, 
+5. While in terminal/console/command prompt, 
    1. Navigate to the area (unix: cd /path/to/Alt_Commander)
    2. (python3 -m[if needed]) pip install -r /path/to/Alt_Commander/requirements.txt
    3. All required libraries should be installed
@@ -36,17 +36,17 @@ Game/interface for Operating smarter bots for R/Place in a semi or fully-autonom
 1. Follow instructions for the client
    1. (minus getting the server data and running it)
 2. Open up /Server/make_server_data.py and run it and follow the prompts or skip them to use the defaults
-3. look at the generated server data file and make sure it looks correct
+3. Look at the generated server data file and make sure it looks correct
 4. Open up the IDLE and run the server
-   1. it should run without error
+   1. It should run without error
    2. Unfortunately this is not enough
-5. If you wish for the server to be public to the internet(you do)
+5. If zou wish for the server to be public to the internet(you do)
    1. Look up 'set up port forwarding on (your isp)'
-   2. follow the instructions they give
-      1. set up a port forward for the port in Server_data.txt
+   2. Follow the instructions they give
+      1. Set up a port forward for the port in Server_data.txt
 6. Once you finish check your work
    1. https://www.portchecktool.com and type in port
-   2. check ip to ensure it looks good(or proxy if you used a proxy instead of your public ip)
+   2. Check ip to ensure it looks good(or proxy if you used a proxy instead of your public ip)
    3. Make sure it says "Success!"
    4. Congrats you have made a hole in your firewall
       1. (Consider turning this off after the event is done)
@@ -57,7 +57,7 @@ Game/interface for Operating smarter bots for R/Place in a semi or fully-autonom
       1. Needs to be a 1:1 png with the exact colors and a color not in the pallet for ignored areas of the square area
    2. Open the script modify the following
    3. corner_pos = (100, 100) 
-      1. where you want the top left corner of the image to go
+      1. Where you want the top left corner of the image to go
    4. file_name = 'Templates/daniil.png'
       1. Path to the image file
 9. Now congrats you should be able to have people join your hosted server as clients
@@ -66,7 +66,7 @@ Game/interface for Operating smarter bots for R/Place in a semi or fully-autonom
 - **Installing and Starting a Command Client**
 1. Not Complete yet
 2. Follow the instructions to start a standard client
-3. select if its in local mode or not
+3. Select if its in local mode or not
    1. Open script and modify to local=True or local=False
 4. Run 'start_cmd_client.py', it should connect to the server and open the interface
 5. Controls are below
