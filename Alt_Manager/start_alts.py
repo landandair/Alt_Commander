@@ -6,6 +6,8 @@ import alt_client
 from threading import Thread
 def main():
     local = True
+    if local:
+        print('Alert: Running in local mode cannot join a server please change if undesired')
     fake_client = True
     account_info = 'Account_Info.txt'
     if fake_client and False:
