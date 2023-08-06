@@ -72,4 +72,5 @@ Game/interface for Operating smarter bots for R/Place in a semi or fully-autonom
 5. Controls are below
 
 **Detailed Instructions of How the Bots Behave and Can Be Controlled**
+
 (TBD Once Cmd client is done)
