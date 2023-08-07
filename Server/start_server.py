@@ -3,8 +3,8 @@ from Server_Client_Data import ServerData
 
 
 if __name__ == '__main__':
-    corner_pos = (100, 100)
-    file_name = 'Templates/daniil.png'
+    corner_pos = (-100, 100)
+    file_name = 'Templates/cat_sword.png'
     try:
         main(ServerData(file_name, corner_pos))
     except KeyboardInterrupt:

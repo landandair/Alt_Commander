@@ -1,6 +1,10 @@
 # Alt_Commander
 Game/interface for Operating smarter bots for R/Place in a semi or fully-autonomous manner.
 
+Contents:
+- Installation instructions
+  - Installing and starting standard
+
 **Install Instructions:**
 - **Installing and Starting a Standard Client**
 1. Download python https://www.python.org/downloads/

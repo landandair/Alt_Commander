@@ -46,7 +46,7 @@ class ServerData:
             for y in range(y_size):
                 color = img.getpixel((x, y))
                 if color != ignored:
-                    self.update_blocks.append((x, y))
+                    self.update_blocks.append((x+self.corner_pos[0], y+self.corner_pos[1]))
 
     def shuffle(self):
         random.shuffle(self.update_blocks)

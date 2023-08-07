@@ -16,26 +16,34 @@ def main(server_data):
 
     for line in lines:
         fields.append(line.strip('\n').split(':')[1])
+    try:
+        ip, port, key = fields
+        fernet = Fernet(key)
+        print(f'starting server on: "{ip}" port: {port}')
 
-    ip, port, key = fields
-    fernet = Fernet(key)
-    print(f'starting server on: "{ip}" port: {port}')
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:  # bind the socket object to the ip and port
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.bind(('', int(port)))
+        except socket.error as e:
+            sys.exit(e)
+        s.listen(2)
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:  # bind the socket object to the ip and port
-        s.bind(('', int(port)))
+        print("Waiting for a connection, Server Started")
+        # Used to assign ship ids to clients
+        while True:  # Main connection loop which listens and creates threads that handle communications with clients
+            conn, addr = s.accept()
+            print("Connected to:", addr)
+            print(f'{len(server_data.bot_positions)+1} bots connected')
+            # Start thread to manage player
+            thread.start_new_thread(threaded_client, (conn, conn.getpeername(), fernet, server_data))
     except socket.error as e:
-        sys.exit(e)
-    s.listen(2)
+        s.close()
+        print(e)
+    except KeyboardInterrupt:
+        print('Closed by user')
+        s.close()
 
-    print("Waiting for a connection, Server Started")
-    # Used to assign ship ids to clients
-    while True:  # Main connection loop which listens and creates threads that handle communications with clients
-        conn, addr = s.accept()
-        print("Connected to:", addr)
-        print(f'{len(server_data.bot_positions)+1} bots connected')
-        # Start thread to manage player
-        thread.start_new_thread(threaded_client, (conn, conn.getpeername(), fernet, server_data))
 
 
 def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
@@ -43,10 +51,10 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
         # Initial behavior send starting position
         img_packets = []
         with open(server_data.file_name, 'rb') as fi:
-            buffer = fi.read(1024)
+            buffer = fi.read(256)
             while buffer:
                 img_packets.append(buffer)
-                buffer = fi.read(1024)
+                buffer = fi.read(256)
         initial = {'pkt_num': len(img_packets), 'corner': server_data.corner_pos}  # Send number of img packets
         encoded = fernet.encrypt(pickle.dumps(initial, protocol=-1))  # Package data
         conn.send(encoded)  # Send initial packet
@@ -73,9 +81,13 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
             handle_cmd_client(conn, fernet, peer_name, server_data, img_sent)
     except KeyboardInterrupt:
         pass
+    except socket.error as e:
+        print(e)
+        pass
 
     time.sleep(1)
     print(f"Lost connection to:{peer_name}")
+    print(f'{len(server_data.bot_positions)} bots remaining')
     conn.close()
 
 def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
