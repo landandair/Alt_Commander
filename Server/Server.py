@@ -7,6 +7,7 @@ import sys
 from cryptography.fernet import Fernet, InvalidToken
 
 def main(server_data):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         with open('../Server_data.txt') as fi:
             lines = fi.readlines()
@@ -21,7 +22,6 @@ def main(server_data):
         fernet = Fernet(key)
         print(f'starting server on: "{ip}" port: {port}')
 
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:  # bind the socket object to the ip and port
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.bind(('', int(port)))
@@ -38,11 +38,11 @@ def main(server_data):
             # Start thread to manage player
             thread.start_new_thread(threaded_client, (conn, conn.getpeername(), fernet, server_data))
     except socket.error as e:
-        s.close()
         print(e)
     except KeyboardInterrupt:
         print('Closed by user')
-        s.close()
+    s.close()
+
 
 
 
@@ -59,6 +59,7 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
         encoded = fernet.encrypt(pickle.dumps(initial, protocol=-1))  # Package data
         conn.send(encoded)  # Send initial packet
         img_sent = True
+        check = -1
         try:
             for buffer in img_packets:
                 check = fernet.decrypt(conn.recv(2048))
@@ -83,7 +84,6 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
         pass
     except socket.error as e:
         print(e)
-        pass
 
     time.sleep(1)
     print(f"Lost connection to:{peer_name}")
