@@ -93,6 +93,7 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
 def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
     given_priority_target = False
     low_priority_target = server_data.get_oldest_update()
+    server_data.bot_targets[peer_name] = ()
     while img_sent:
         try:
             data = conn.recv(2048)
@@ -103,6 +104,14 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
             data = pickle.loads(fernet.decrypt(data))
             # Use data to update server data and send essential updates back to client
             server_data.bot_positions[peer_name] = data['pos']
+            # Takes in a movement command from the server or a reset command
+            if server_data.bot_targets[peer_name] and not given_priority_target:
+                if server_data.bot_targets[peer_name] == 'r':
+                    data['reboot'] = True
+                else:  # Means it's a coordinate
+                    low_priority_target = server_data.bot_targets[peer_name]
+                    server_data.bot_targets[peer_name] = ()
+
             if data['pos'] == data['target']:  # Target has been reached need new target
                 if given_priority_target:
                     given_priority_target = False
@@ -137,14 +146,29 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
 def handle_cmd_client(conn, fernet, peer_name, server_data, img_sent):
     while img_sent:
         try:
-            data = conn.recv(2048)
+            data = conn.recv(5*2048)
             if not data:
                 if peer_name in server_data.bot_positions:
                     server_data.bot_positions.pop(peer_name)
                 break
             data = pickle.loads(fernet.decrypt(data))
+            # Handling
+            if data['goto_range']:
+                server_data.prioritize_area(data['goto_range'])
+            if data['shuffle']:
+                server_data.shuffle()
+            if data['reboot']:
+                server_data.reboot_all()
+            if data['moves']:
+                for bot in data['moves']:
+                    move = data['moves'][bot]
+                    server_data.bot_targets[bot] = move
 
-            encoded = fernet.encrypt(pickle.dumps(data, protocol=-1))
+            returning_data = {'bot_pos': server_data.bot_positions,
+                              'bad_blocks': server_data.bad_blocks}
+
+            encoded = fernet.encrypt(pickle.dumps(returning_data, protocol=-1))
+            print(len(encoded))
             conn.send(encoded)
         except socket.error as e:
             print(e)

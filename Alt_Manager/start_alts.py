@@ -10,7 +10,7 @@ def main():
         print('Alert: Running in local mode cannot join a server please change if undesired')
     fake_client = True
     account_info = 'Account_Info.txt'
-    if fake_client and False:
+    if fake_client:
         account_info = 'Example_Account_Info.txt'
     info = [True]
     allowed_fails = 10  # -1 means infinite restarts (Not recommended)
@@ -68,6 +68,7 @@ def manage_individual_client(username, password, info, local=False, fake_client=
         except KeyboardInterrupt:
             sys.exit(f'{username} interrupted by user')
     # bot_interface.SwarmPlaceBot(username, password)
+
 
 if __name__ == '__main__':
     main()

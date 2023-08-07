@@ -12,6 +12,7 @@ class ServerData:
         self.bad_blocks = []
         self.update_blocks = []
         self.bot_positions = {}
+        self.bot_targets = {}
         self.file_name = file_name
         img = Image.open(file_name)
         self.get_image_coordinates(img, ignored_color)
@@ -50,4 +51,17 @@ class ServerData:
 
     def shuffle(self):
         random.shuffle(self.update_blocks)
+
+    def prioritize_area(self, pos_range):
+        tl, br = pos_range
+        for x in range(tl[0], br[0]):
+            for y in range(tl[1], br[1]):
+                pos = (x, y)
+                if pos in self.update_blocks:
+                    self.update_blocks.remove(pos)
+                    self.update_blocks.insert(0, pos)
+
+    def reboot_all(self):
+        for key in self.bot_targets:
+            self.bot_targets[key] = 'r'  # for reboot
 

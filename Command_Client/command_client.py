@@ -3,6 +3,7 @@ import socket
 import pickle
 import sys
 from cryptography.fernet import Fernet
+import Server.Server_Client_Data
 
 
 class CmdNetwork:
@@ -61,6 +62,6 @@ if __name__ == '__main__':
         time.sleep(1)
         data = {'goto_range': (),
                 'shuffle': False,
-                'moves': (),
+                'moves': {},
                 'reboot': False}
         print(network.send(data))
