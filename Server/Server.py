@@ -85,9 +85,9 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
     except socket.error as e:
         print(e)
 
-    time.sleep(1)
     print(f"Lost connection to:{peer_name}")
     print(f'{len(server_data.bot_positions)} bots remaining')
+    time.sleep(1)
     conn.close()
 
 def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):

@@ -49,7 +49,7 @@ class CmdNetwork:
     def send(self, data):
         try:
             self.client.send(self.fernet.encrypt(pickle.dumps(data, protocol=-1)))
-            data = self.client.recv(5*2048)
+            data = self.client.recv(1048576)
             return pickle.loads(self.fernet.decrypt(data))
         except socket.error as e:
             print(e)
