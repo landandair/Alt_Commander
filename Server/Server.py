@@ -168,7 +168,6 @@ def handle_cmd_client(conn, fernet, peer_name, server_data, img_sent):
                               'bad_blocks': server_data.bad_blocks}
 
             encoded = fernet.encrypt(pickle.dumps(returning_data, protocol=-1))
-            print(len(encoded))
             conn.send(encoded)
         except socket.error as e:
             print(e)

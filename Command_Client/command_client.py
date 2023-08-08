@@ -55,6 +55,31 @@ class CmdNetwork:
             print(e)
 
 
+def start_cmd_client(cmd_client_data):
+    connection = CmdNetwork(local_mode=cmd_client_data.local)
+    while cmd_client_data.running:
+        time.sleep(.5)
+        data = {'goto_range': (),
+                'shuffle': False,
+                'moves': {},
+                'reboot': False}
+        if cmd_client_data.goto_range:
+            data['goto_range'] = cmd_client_data.goto_range
+            cmd_client_data.goto_range = ()
+        if cmd_client_data.shuffle:
+            data['shuffle'] = cmd_client_data.shuffle
+            cmd_client_data.shuffle = False
+        if cmd_client_data.moves:
+            data['moves'] = cmd_client_data.moves
+            cmd_client_data.moves = {}
+        if cmd_client_data.reboot:
+            data['reboot'] = cmd_client_data.reboot
+            cmd_client_data.reboot = False
+        returned = connection.send(data)
+        cmd_client_data.bot_pos = returned['bot_pos']
+        cmd_client_data.bad_blocks = returned['bad_blocks']
+
+
 if __name__ == '__main__':
     # debug code which sends working data and was used to develop com protocol
     network = CmdNetwork(local_mode=True)
