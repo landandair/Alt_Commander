@@ -34,7 +34,6 @@ def main(server_data):
         while True:  # Main connection loop which listens and creates threads that handle communications with clients
             conn, addr = s.accept()
             print("Connected to:", addr)
-            print(f'{len(server_data.bot_positions)+1} bots connected')
             # Start thread to manage player
             thread.start_new_thread(threaded_client, (conn, conn.getpeername(), fernet, server_data))
     except socket.error as e:
@@ -77,8 +76,10 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
         # Image Finished sending
         # Process alt_clients
         if int(check) == 1:
+            print(f'{len(server_data.bot_positions)+1} bots connected')
             handle_alt_client(conn, fernet, peer_name, server_data, img_sent)
         else:
+            print('Commander joined the server!')
             handle_cmd_client(conn, fernet, peer_name, server_data, img_sent)
     except KeyboardInterrupt:
         pass

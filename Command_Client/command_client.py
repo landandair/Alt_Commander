@@ -2,7 +2,7 @@ import time
 import socket
 import pickle
 import sys
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 import Server.Server_Client_Data
 
 
@@ -53,6 +53,9 @@ class CmdNetwork:
             return pickle.loads(self.fernet.decrypt(data))
         except socket.error as e:
             print(e)
+        except InvalidToken:
+            print('Partial or incomplete data received')
+            return
 
 
 def start_cmd_client(cmd_client_data):
@@ -78,8 +81,11 @@ def start_cmd_client(cmd_client_data):
                 data['reboot'] = cmd_client_data.reboot
                 cmd_client_data.reboot = False
             returned = connection.send(data)
-            cmd_client_data.bot_pos = returned['bot_pos']
-            cmd_client_data.bad_blocks = returned['bad_blocks']
+            if returned:
+                cmd_client_data.bot_pos = returned['bot_pos']
+                cmd_client_data.bad_blocks = returned['bad_blocks']
+            else:
+                raise socket.error
     except socket.error as e:
         cmd_client_data.running = False
         sys.exit(e)
