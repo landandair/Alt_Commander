@@ -62,6 +62,7 @@ def start_cmd_client(cmd_client_data):
     try:
         connection = CmdNetwork(local_mode=cmd_client_data.local)
         cmd_client_data.booted = True
+        cmd_client_data.corner_pos = connection.corner_pos
         while cmd_client_data.running:
             time.sleep(.5)
             data = {'goto_range': (),
