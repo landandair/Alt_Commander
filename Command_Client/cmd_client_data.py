@@ -1,9 +1,8 @@
-
-
 class CmdData:
     def __init__(self, local_mode=False):
         self.local = local_mode
         self.running = True
+        self.booted = False
         self.bot_positions = {}
         self.bad_blocks = []
         self.goto_range = ()

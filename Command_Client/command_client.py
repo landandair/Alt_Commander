@@ -44,7 +44,7 @@ class CmdNetwork:
             return data
         except socket.error as e:
             print(e)
-            sys.exit('Could not connect to server')
+            raise e
 
     def send(self, data):
         try:
@@ -56,28 +56,33 @@ class CmdNetwork:
 
 
 def start_cmd_client(cmd_client_data):
-    connection = CmdNetwork(local_mode=cmd_client_data.local)
-    while cmd_client_data.running:
-        time.sleep(.5)
-        data = {'goto_range': (),
-                'shuffle': False,
-                'moves': {},
-                'reboot': False}
-        if cmd_client_data.goto_range:
-            data['goto_range'] = cmd_client_data.goto_range
-            cmd_client_data.goto_range = ()
-        if cmd_client_data.shuffle:
-            data['shuffle'] = cmd_client_data.shuffle
-            cmd_client_data.shuffle = False
-        if cmd_client_data.moves:
-            data['moves'] = cmd_client_data.moves
-            cmd_client_data.moves = {}
-        if cmd_client_data.reboot:
-            data['reboot'] = cmd_client_data.reboot
-            cmd_client_data.reboot = False
-        returned = connection.send(data)
-        cmd_client_data.bot_pos = returned['bot_pos']
-        cmd_client_data.bad_blocks = returned['bad_blocks']
+    try:
+        connection = CmdNetwork(local_mode=cmd_client_data.local)
+        cmd_client_data.booted = True
+        while cmd_client_data.running:
+            time.sleep(.5)
+            data = {'goto_range': (),
+                    'shuffle': False,
+                    'moves': {},
+                    'reboot': False}
+            if cmd_client_data.goto_range:
+                data['goto_range'] = cmd_client_data.goto_range
+                cmd_client_data.goto_range = ()
+            if cmd_client_data.shuffle:
+                data['shuffle'] = cmd_client_data.shuffle
+                cmd_client_data.shuffle = False
+            if cmd_client_data.moves:
+                data['moves'] = cmd_client_data.moves
+                cmd_client_data.moves = {}
+            if cmd_client_data.reboot:
+                data['reboot'] = cmd_client_data.reboot
+                cmd_client_data.reboot = False
+            returned = connection.send(data)
+            cmd_client_data.bot_pos = returned['bot_pos']
+            cmd_client_data.bad_blocks = returned['bad_blocks']
+    except socket.error as e:
+        cmd_client_data.running = False
+        sys.exit(e)
 
 
 if __name__ == '__main__':

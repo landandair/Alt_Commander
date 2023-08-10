@@ -1,4 +1,6 @@
+import socket
 import sys
+import time
 from threading import Thread
 from command_client import start_cmd_client
 import pygame_gui
@@ -15,11 +17,18 @@ def main():
         server_connection_thread.start()
         # Start up gui
         window = pygame_gui.Window(cmd_data)
-        while True:
+        for x in range(10):
+            if cmd_data.booted:
+                break
+            time.sleep(1)
+        while cmd_data.running:
             window.update()
     except KeyboardInterrupt:
         cmd_data.running = False
         sys.exit('User interrupted')
+    except socket.error as e:
+        cmd_data.running = False
+        sys.exit(e)
 
 
 if __name__ == '__main__':
