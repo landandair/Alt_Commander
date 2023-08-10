@@ -17,9 +17,7 @@ def main():
         server_connection_thread.start()
         # Start up gui
         window = pygame_gui.Window(cmd_data)
-        for x in range(10):
-            if cmd_data.booted:
-                break
+        while cmd_data.booted or not cmd_data.running:
             time.sleep(1)
         while cmd_data.running:
             window.update()
