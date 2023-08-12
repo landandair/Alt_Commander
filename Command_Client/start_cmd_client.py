@@ -20,11 +20,13 @@ def main():
         server_connection_thread = Thread(target=start_cmd_client, args=arg)
         server_connection_thread.start()
         while not cmd_data.booted and cmd_data.running:
-            time.sleep(1)
+            time.sleep(.5)
+        time.sleep(1)
         # Start up gui
-        window = pygame_gui.Window(cmd_data)
-        while cmd_data.running:
-            window.update()
+        if cmd_data.running:
+            window = pygame_gui.Window(cmd_data)
+            while cmd_data.running:
+                window.update()
     except KeyboardInterrupt:
         cmd_data.running = False
         pg.quit()

@@ -83,7 +83,7 @@ def start_cmd_client(cmd_client_data):
                 cmd_client_data.reboot = False
             returned = connection.send(data)
             if returned:
-                cmd_client_data.bot_pos = returned['bot_pos']
+                cmd_client_data.bot_positions = returned['bot_pos']
                 cmd_client_data.bad_blocks = returned['bad_blocks']
             else:
                 raise socket.error
