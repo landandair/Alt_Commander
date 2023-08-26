@@ -3,7 +3,6 @@ import os
 from PIL import Image
 import pickle
 
-color_selector_height = 0
 def make_dict_files(img: Image):
     white = (255, 255, 255)
     window_size = (800, 600)
@@ -11,6 +10,7 @@ def make_dict_files(img: Image):
     img_to_window = lambda pos: (pos[0] * window_size[0]//size[0], pos[1] * window_size[1]//size[1])
 
     """Find color button positions"""
+    color_selector_height = 0
     for y in range(1,size[1]):
         color = img.getpixel((10, size[1]-y))[:3]
         if color != white:
@@ -62,6 +62,7 @@ def make_dict_files(img: Image):
             last_color = color
 
     last_color = white
+    end = 'error'
     for x in range(size[0]):
         pos = (x, check_rows[-1] + color_selector_height)
         color = img.getpixel(pos)[:3]
