@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import pickle
 from PIL import Image
@@ -25,6 +26,7 @@ class SwarmPlaceBot:
         self.corner_pos = client.corner_pos
         self.ignore_color = client.ignore
         self.user = username
+        self.screenshot = os.getcwd() + f'/screenshots/{self.user}.png'
         self.pwd = password
         options = Options()
         options.add_argument("--width=800")
@@ -48,6 +50,11 @@ class SwarmPlaceBot:
         self.open_place()
         time.sleep(1)
         self.check_ready()
+        # Consider adding a test of movement as well
+        if not self.get_pos():
+            sys.exit('Built in test failed: \n' +
+                     ' - look at the screenshots as it boots to see the fault\n' +
+                     ' - recompute the movement_pos dictionary(follow instructions)')
 
     def login(self):
         # Go to login page and fill in info and submit
@@ -157,7 +164,7 @@ class SwarmPlaceBot:
     def place_color(self):
         location = self.color_to_pos['place']  # Wrong?
         action = action_chains.ActionBuilder(self.driver)
-        action.pointer_action.move_to_location(location)
+        action.pointer_action.move_to_location(location[0], location[1])
         action.pointer_action.click()
         action.perform()
 
@@ -181,7 +188,7 @@ class SwarmPlaceBot:
         location = self.offset_to_pos[offset]  # Wrong ?
         self.expected_pos = (offset[0] + self.expected_pos[0], offset[1] + self.expected_pos[1])
         action = action_chains.ActionBuilder(self.driver)
-        action.pointer_action.move_to_location(location)
+        action.pointer_action.move_to_location(location[0], location[1])
         action.pointer_action.click()
         action.perform()
 
@@ -218,6 +225,9 @@ class FakeSwarmPlaceBot:
         self.ready = False  # Ready to place
         self.placed = 0
 
+        self.selected_color = (0, 0, 0)  # Default will be changed(since no screenshot will be taken)
+        self.last_place = 0  # Time since last placed pixel
+        self.frequency = 60  # how often it will consider itself ready(since no screenshot is present)
         self.login()  # Logged in
         time.sleep(2)
         self.open_place()
@@ -268,18 +278,14 @@ class FakeSwarmPlaceBot:
         self.client_dat = self.client.send(self.client_dat)
         self.target = self.client_dat['target']
 
-    def check_ready(self):
-        img = Image.open(self.screenshot)
-        img.convert('RGB')
-        self.ready = img.getpixel((1550, 1191)) == (255, 255, 255, 255)  # Ready to place
-        if self.ready:
-            for key in self.color_to_pos.keys():
-                if img.getpixel(self.color_to_pos[key])[:3] != key and key != 'place':
-                    print(img.getpixel(self.color_to_pos[key])[:3], key, self.color_to_pos[key])
-                    print('Problem with the button positions')
-                    make_dict_files(img)
-                    with open('Dictionaries/button_pos.pickle', 'rb') as fi:
-                        self.color_to_pos = pickle.loads(fi.read())
+    def check_ready(self):  # Fake
+        # img = Image.open(self.screenshot)
+        # img.convert('RGB')
+        if self.last_place+self.frequency < time.time():  # FAKE
+            self.ready = True
+        else:
+            self.ready = False
+
 
     def get_bad_pixels(self):
         bad_pixels = []
@@ -316,22 +322,27 @@ class FakeSwarmPlaceBot:
         except IndexError:
             return 'ignore'
 
-    def get_screen_color(self, offset):
-        img = Image.open(self.screenshot)
+    def get_screen_color(self, offset):  # Fake
+        img = Image.open(self.screenshot)  # This is just a fake game board
         img.convert('RGB')
-        color = img.getpixel(self.offset_to_pos[offset])
+        # Fake
+        pos = (offset[0] + self.pos[0], offset[1]+self.pos[1])
+        color = img.getpixel(pos)
         color = self.get_closest_color(color)
         return color
 
     def pick_color(self, color):
-        location = self.color_to_pos[color]
+        # location = self.color_to_pos[color]
+        self.selected_color = color
         # action = action_chains.ActionBuilder(self.driver)
         # action.pointer_action.move_to_location(location[0], location[1])
         # action.pointer_action.double_click()
         # action.perform()
 
-    def place_color(self):
-        pass
+    def place_color(self):  # Fake
+        img = Image.open(self.screenshot)  # This is just a fake game board
+        img.convert('RGB')
+        img.putpixel(self.pos, self.selected_color)
         # action = action_chains.ActionBuilder(self.driver)
         # action.pointer_action.move_to_location(self.color_to_pos['place'])
         # action.pointer_action.click()
@@ -354,7 +365,7 @@ class FakeSwarmPlaceBot:
             self.move_by_offset(best_move)
 
     def move_by_offset(self, offset):
-        location = self.offset_to_pos[offset]
+        # location = self.offset_to_pos[offset]
         self.expected_pos = (offset[0] + self.expected_pos[0], offset[1] + self.expected_pos[1])
         # action = action_chains.ActionBuilder(self.driver)
         # action.pointer_action.move_to_location(location)
