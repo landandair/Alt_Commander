@@ -7,6 +7,7 @@ class ServerData:
         one client to the other
         contents:
             -"""
+        self.ignored_color = ignored_color
         self.keep_alive = True
         self.corner_pos = corner_pos
         self.bad_blocks = []

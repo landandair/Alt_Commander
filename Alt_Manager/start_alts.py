@@ -17,17 +17,16 @@ def main():
     processes = []
     try:
         with open(account_info) as fi:
-            line = fi.readline()
-            while line:
+            for line in fi:
                 if line[0] != '#' and line != '\n':
                     print('Starting')
-                    user, pwd = line.split(' ')
+                    user, pwd = line.strip('\n').split(' ')
                     inputs = (user, pwd, info, local, fake_client)
                     process = Thread(target=manage_individual_client, args=inputs)
                     process.start()
                     processes.append([process, inputs, allowed_fails])
                     time.sleep(.5)
-                line = fi.readline()
+                    break
 
         while True:
             time.sleep(1)

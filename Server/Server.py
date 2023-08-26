@@ -54,7 +54,7 @@ def threaded_client(conn, peer_name, fernet: Fernet, server_data: ServerData):
             while buffer:
                 img_packets.append(buffer)
                 buffer = fi.read(256)
-        initial = {'pkt_num': len(img_packets), 'corner': server_data.corner_pos}  # Send number of img packets
+        initial = {'pkt_num': len(img_packets), 'corner': server_data.corner_pos, 'ignore': server_data.ignored_color}  # Send number of img packets
         encoded = fernet.encrypt(pickle.dumps(initial, protocol=-1))  # Package data
         conn.send(encoded)  # Send initial packet
         img_sent = True
