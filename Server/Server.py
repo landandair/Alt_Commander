@@ -116,6 +116,7 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
             if data['pos'] == data['target']:  # Target has been reached need new target
                 if given_priority_target:
                     given_priority_target = False
+                    low_priority_target = server_data.get_oldest_update()
                 else:
                     # print(f'{peer_name}: {low_priority_target}')  # REMOVE
                     low_priority_target = server_data.get_oldest_update()
@@ -134,7 +135,7 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
             if data['bad_blocks']:
                 for block in data['bad_blocks']:
                     if block in server_data.update_blocks and block not in server_data.bad_blocks:
-                        server_data.bad_blocks.append(block)
+                        server_data.bad_blocks.insert(0, block)
             data['bad_blocks'] = []
 
             encoded = fernet.encrypt(pickle.dumps(data, protocol=-1))

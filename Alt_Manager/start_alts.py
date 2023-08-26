@@ -26,7 +26,7 @@ def main():
                     process.start()
                     processes.append([process, inputs, allowed_fails])
                     time.sleep(.5)
-                    break
+                    break  # REMOVE
 
         while True:
             time.sleep(1)

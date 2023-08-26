@@ -1,5 +1,6 @@
 from PIL import Image
 import random
+import numpy as np
 
 class ServerData:
     def __init__(self, file_name, corner_pos, ignored_color=(125, 230, 242)):

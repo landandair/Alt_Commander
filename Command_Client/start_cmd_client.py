@@ -27,6 +27,8 @@ def main():
             window = pygame_gui.Window(cmd_data)
             while cmd_data.running:
                 window.update()
+        pg.quit()
+        sys.exit('not in running status')
     except KeyboardInterrupt:
         cmd_data.running = False
         pg.quit()

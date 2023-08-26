@@ -90,13 +90,14 @@ class SwarmPlaceBot:
             self.pick_color(ref_color)
             self.place_color()
             self.client_dat['ready'] = False
-            self.client_dat['bad_blocks'].pop(self.pos)
+            self.client_dat['bad_blocks'].remove(self.pos)
             self.placed += 1
             print(f'{self.user} has placed {self.placed} pixels')
+            self.client_dat = self.client.send(self.client_dat)
             time.sleep(2)
         else:
             self.move_toward_target()
-        self.client_dat = self.client.send(self.client_dat)
+            self.client_dat = self.client.send(self.client_dat)
         self.target = self.client_dat['target']
 
     def check_ready(self):
@@ -114,11 +115,13 @@ class SwarmPlaceBot:
 
     def get_bad_pixels(self):
         bad_pixels = []
+        img = Image.open(self.screenshot)
+        img.convert('RGB')
         for offset in self.offset_to_pos:
             if offset != 'border_moves':
                 pos = (offset[0] + self.pos[0], offset[1]+self.pos[1])
                 ref_color = self.get_ref_pixel(pos)
-                color = self.get_screen_color(offset)
+                color = self.get_screen_color(offset, img)
                 if ref_color != 'ignore' and ref_color != color:
                     bad_pixels.append(pos)
         return bad_pixels
@@ -147,9 +150,7 @@ class SwarmPlaceBot:
         except IndexError:
             return 'ignore'
 
-    def get_screen_color(self, offset):
-        img = Image.open(self.screenshot)
-        img.convert('RGB')
+    def get_screen_color(self, offset, img):
         color = img.getpixel(self.offset_to_pos[offset])  # Wrong?
         color = self.get_closest_color(color)
         return color
@@ -213,7 +214,7 @@ class FakeSwarmPlaceBot:
         self.client = client
         self.corner_pos = client.corner_pos
         self.ignore_color = client.ignore
-        self.user = 'fake_user'
+        self.user = 'game_board'  # Use fake_user for testing of screenshot_Analysis
         self.screenshot = os.getcwd() + f'/screenshots/{self.user}.png'
         self.pwd = password
         self.target = self.client_dat['target']
@@ -227,7 +228,7 @@ class FakeSwarmPlaceBot:
 
         self.selected_color = (0, 0, 0)  # Default will be changed(since no screenshot will be taken)
         self.last_place = 0  # Time since last placed pixel
-        self.frequency = 60  # how often it will consider itself ready(since no screenshot is present)
+        self.frequency = 10  # how often it will consider itself ready(since no screenshot is present)
         self.login()  # Logged in
         time.sleep(2)
         self.open_place()
@@ -269,14 +270,16 @@ class FakeSwarmPlaceBot:
             self.pick_color(ref_color)
             self.place_color()
             self.client_dat['ready'] = False
-            self.client_dat['bad_blocks'].pop(self.pos)
+            self.client_dat['bad_blocks'].remove(self.pos)
             self.placed += 1
             print(f'{self.user} has placed {self.placed} pixels')
+            self.client_dat = self.client.send(self.client_dat)
             time.sleep(2)
         else:
             self.move_toward_target()
-        self.client_dat = self.client.send(self.client_dat)
+            self.client_dat = self.client.send(self.client_dat)
         self.target = self.client_dat['target']
+        print(f'Target = {self.target}')
 
     def check_ready(self):  # Fake
         # img = Image.open(self.screenshot)
@@ -289,11 +292,13 @@ class FakeSwarmPlaceBot:
 
     def get_bad_pixels(self):
         bad_pixels = []
+        img = Image.open(self.screenshot)  # open screeenshot for performance
+        img.convert('RGB')
         for offset in self.offset_to_pos:
             if offset != 'border_moves':
                 pos = (offset[0] + self.pos[0], offset[1]+self.pos[1])
                 ref_color = self.get_ref_pixel(pos)
-                color = self.get_screen_color(offset)
+                color = self.get_screen_color(offset, img)
                 if ref_color != 'ignore' and ref_color != color:
                     bad_pixels.append(pos)
         return bad_pixels
@@ -322,9 +327,7 @@ class FakeSwarmPlaceBot:
         except IndexError:
             return 'ignore'
 
-    def get_screen_color(self, offset):  # Fake
-        img = Image.open(self.screenshot)  # This is just a fake game board
-        img.convert('RGB')
+    def get_screen_color(self, offset, img):  # Fake
         # Fake
         pos = (offset[0] + self.pos[0], offset[1]+self.pos[1])
         color = img.getpixel(pos)
@@ -343,6 +346,8 @@ class FakeSwarmPlaceBot:
         img = Image.open(self.screenshot)  # This is just a fake game board
         img.convert('RGB')
         img.putpixel(self.pos, self.selected_color)
+        self.last_place = time.time()
+        img.save(self.screenshot)
         # action = action_chains.ActionBuilder(self.driver)
         # action.pointer_action.move_to_location(self.color_to_pos['place'])
         # action.pointer_action.click()
