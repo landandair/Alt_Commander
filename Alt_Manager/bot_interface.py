@@ -279,7 +279,6 @@ class FakeSwarmPlaceBot:
             self.move_toward_target()
             self.client_dat = self.client.send(self.client_dat)
         self.target = self.client_dat['target']
-        print(f'Target = {self.target}')
 
     def check_ready(self):  # Fake
         # img = Image.open(self.screenshot)
