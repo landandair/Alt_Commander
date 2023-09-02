@@ -1,6 +1,7 @@
 import sys
 import time
-
+import os
+from PIL import Image
 import bot_interface
 import alt_client
 from threading import Thread
@@ -12,6 +13,7 @@ def main():
     account_info = 'Account_Info.txt'
     if fake_client:
         account_info = 'Example_Account_Info.txt'
+        image = Image.open(os.getcwd() + '/screenshots/game_board.png')
     info = [True]
     allowed_fails = 10  # -1 means infinite restarts (Not recommended)
     processes = []
@@ -21,12 +23,13 @@ def main():
                 if line[0] != '#' and line != '\n':
                     print('Starting')
                     user, pwd = line.strip('\n').split(' ')
+                    if fake_client:
+                        pwd = image
                     inputs = (user, pwd, info, local, fake_client)
                     process = Thread(target=manage_individual_client, args=inputs)
                     process.start()
                     processes.append([process, inputs, allowed_fails])
                     time.sleep(.5)
-                    break  # REMOVE
 
         while True:
             time.sleep(1)

@@ -28,7 +28,7 @@ def main():
             while cmd_data.running:
                 window.update()
         pg.quit()
-        sys.exit('not in running status')
+        sys.exit('No connection to server')
     except KeyboardInterrupt:
         cmd_data.running = False
         pg.quit()

@@ -98,7 +98,7 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
     server_data.bot_targets[peer_name] = ()
     while img_sent:
         try:
-            data = conn.recv(2048)
+            data = conn.recv(2*2048)
             if not data:
                 if peer_name in server_data.bot_positions:
                     server_data.bot_positions.pop(peer_name)
@@ -136,7 +136,7 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
             if data['bad_blocks']:
                 for block in data['bad_blocks']:
                     if block in server_data.update_blocks and block not in server_data.bad_blocks:
-                        server_data.bad_blocks.insert(0, block)
+                        server_data.bad_blocks.append(block)
             data['bad_blocks'] = []
 
             encoded = fernet.encrypt(pickle.dumps(data, protocol=-1))
@@ -168,7 +168,7 @@ def handle_cmd_client(conn, fernet, peer_name, server_data, img_sent):
                     server_data.bot_targets[bot] = move
 
             returning_data = {'bot_pos': server_data.bot_positions,
-                              'bad_blocks': server_data.bad_blocks}
+                              'bad_blocks': server_data.bad_blocks[:3500]}
 
             encoded = fernet.encrypt(pickle.dumps(returning_data, protocol=-1))
             conn.send(encoded)

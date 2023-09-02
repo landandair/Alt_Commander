@@ -8,8 +8,9 @@ class Window:
     def __init__(self, cmd_data):
         self.cmd_data = cmd_data
         pg.init()
-        self.image = Image.open('template_img.png')
-        self.h_w = self.image.size[1]/self.image.size[0]  # height to width Ratio
+        image = Image.open('template_img.png')
+        pg.display.set_icon(pg.image.load('template_img.png'))
+        self.h_w = image.size[1]/image.size[0]  # height to width Ratio
         self.monitor_size = np.array((pg.display.Info().current_w, pg.display.Info().current_h))
         if self.monitor_size[0] * self.h_w > self.monitor_size[1]:
             self.w = self.monitor_size[1]/self.h_w
@@ -18,7 +19,8 @@ class Window:
         self.h = self.w * self.h_w
 
         corner = self.cmd_data.corner_pos
-        pixel_size = self.w/self.image.size[0]
+        pixel_size = self.w/image.size[0]
+        self.pixel_size = pixel_size
         x_start = (self.monitor_size[0] - self.w)/2 + pixel_size/2
         y_start = (self.monitor_size[1] - self.h)/2 + pixel_size/2
         self.abs_to_pos = lambda pos: ((pos[0]-corner[0])*pixel_size + x_start, (pos[1]-corner[1])*pixel_size + y_start)
@@ -34,6 +36,10 @@ class Window:
         self.bot_group = pg.sprite.Group()
         self.bot_dict = {}
         self.check_for_new_bots()
+        # bad blocks
+        self.bad_group = pg.sprite.Group()
+        self.bad_list = []
+        self.check_for_bad_blocks()
 
         # Ui
         self.ui_elements = pg.sprite.Group()
@@ -46,13 +52,17 @@ class Window:
         self.manage_events()
         # UI
         self.check_for_new_bots()
+        self.check_for_bad_blocks()
+
         self.bot_group.update(self.bot_dict, self.cmd_data.bot_positions)
+        self.bad_group.update(self.bad_list, self.cmd_data.bad_blocks)
         self.ui_elements.update()
         self.selection_boxes.update()
         # display layer from bottom to top
         self.screen.fill((40, 40, 40))
         self.background.draw(self.screen)
         # Ui
+        self.bad_group.draw(self.screen)
         self.bot_group.draw(self.screen)
         self.ui_elements.draw(self.screen)
         self.selection_boxes.draw(self.screen)
@@ -97,9 +107,17 @@ class Window:
         for id in self.cmd_data.bot_positions:
             if id not in self.bot_dict:
                 pos = self.cmd_data.bot_positions[id]
-                bot = Pygame_Objects.BotPosIndicator(id, pos, self.abs_to_pos, 20)
+                bot = Pygame_Objects.BotPosIndicator(id, pos, self.abs_to_pos, self.pixel_size+1)
                 self.bot_dict[id] = False  # Selected
                 self.bot_group.add(bot)
+
+    def check_for_bad_blocks(self):
+        if len(self.cmd_data.bad_blocks) != len(self.bad_list):
+            for pos in self.cmd_data.bad_blocks:
+                if pos not in self.bad_list:
+                    bad_block = Pygame_Objects.BadBlockIndicator(pos, self.abs_to_pos, self.pixel_size)
+                    self.bad_list.append(pos)
+                    self.bad_group.add(bad_block)
 
     def select_bots(self):
         # Collide the box surface with the bot sprites to get the selected bots, add them to a list

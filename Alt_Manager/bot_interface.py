@@ -2,6 +2,8 @@ import os
 import sys
 import time
 import pickle
+
+import numpy as np
 from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.common import action_chains
@@ -204,7 +206,7 @@ class SwarmPlaceBot:
 
 
 class FakeSwarmPlaceBot:
-    def __init__(self, username, password, client, template='template_img.png'):
+    def __init__(self, username, image_object, client, template='template_img.png'):
         with open('Dictionaries/button_pos.pickle', 'rb') as fi:  # Read in button pos dictionary
             self.color_to_pos = pickle.loads(fi.read())
         with open('Dictionaries/movement_pos.pickle', 'rb') as fi:  # Read in button pos dictionary
@@ -216,7 +218,7 @@ class FakeSwarmPlaceBot:
         self.ignore_color = client.ignore
         self.user = 'game_board'  # Use fake_user for testing of screenshot_Analysis
         self.screenshot = os.getcwd() + f'/screenshots/{self.user}.png'
-        self.pwd = password
+        self.image = image_object
         self.target = self.client_dat['target']
         self.pos = self.client_dat['target']
         self.expected_pos = self.pos
@@ -228,7 +230,7 @@ class FakeSwarmPlaceBot:
 
         self.selected_color = (0, 0, 0)  # Default will be changed(since no screenshot will be taken)
         self.last_place = 0  # Time since last placed pixel
-        self.frequency = 10  # how often it will consider itself ready(since no screenshot is present)
+        self.frequency = 30  # how often it will consider itself ready(since no screenshot is present)
         self.login()  # Logged in
         time.sleep(2)
         self.open_place()
@@ -291,7 +293,7 @@ class FakeSwarmPlaceBot:
 
     def get_bad_pixels(self):
         bad_pixels = []
-        img = Image.open(self.screenshot)  # open screeenshot for performance
+        img = self.image
         img.convert('RGB')
         for offset in self.offset_to_pos:
             if offset != 'border_moves':
@@ -329,7 +331,7 @@ class FakeSwarmPlaceBot:
     def get_screen_color(self, offset, img):  # Fake
         # Fake
         pos = (offset[0] + self.pos[0], offset[1]+self.pos[1])
-        color = img.getpixel(pos)
+        color = img.getpixel(pos)[:3]
         color = self.get_closest_color(color)
         return color
 
@@ -342,7 +344,7 @@ class FakeSwarmPlaceBot:
         # action.perform()
 
     def place_color(self):  # Fake
-        img = Image.open(self.screenshot)  # This is just a fake game board
+        img = self.image  # This is just a fake game board
         img.convert('RGB')
         img.putpixel(self.pos, self.selected_color)
         self.last_place = time.time()

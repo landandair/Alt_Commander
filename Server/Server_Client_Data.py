@@ -56,8 +56,8 @@ class ServerData:
 
     def prioritize_area(self, pos_range):
         tl, br = pos_range
-        for x in range(round(tl[0]), round(br[0])):
-            for y in range(round(tl[1]), round(br[1])):
+        for y in range(round(tl[1]), round(br[1])):
+            for x in range(round(tl[0]), round(br[0])):
                 pos = (x, y)
                 if pos in self.update_blocks:
                     self.update_blocks.remove(pos)
