@@ -4,12 +4,15 @@ import numpy as np
 from PIL import Image
 import Pygame_Objects
 
+
+# noinspection PyTypeChecker
 class Window:
     def __init__(self, cmd_data):
         self.cmd_data = cmd_data
         pg.init()
-        image = Image.open('template_img.png')
-        pg.display.set_icon(pg.image.load('template_img.png'))
+        self.template = 'template_img.png'
+        image = Image.open(self.template)
+        pg.display.set_icon(pg.image.load(self.template))
         self.h_w = image.size[1]/image.size[0]  # height to width Ratio
         self.monitor_size = np.array((pg.display.Info().current_w, pg.display.Info().current_h))
         if self.monitor_size[0] * self.h_w > self.monitor_size[1]:
@@ -100,7 +103,7 @@ class Window:
 
     def make_tiles(self):
         center = (self.monitor_size[0]/2, self.monitor_size[1]/2)
-        bg = Pygame_Objects.Background('template_img.png', self.w, self.h, center)
+        bg = Pygame_Objects.Background(self.template, self.w, self.h, center)
         self.background.add(bg)
 
     def check_for_new_bots(self):
