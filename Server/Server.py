@@ -107,12 +107,13 @@ def handle_alt_client(conn, fernet, peer_name, server_data, img_sent):
             # Use data to update server data and send essential updates back to client
             server_data.bot_positions[peer_name] = data['pos']
             # Takes in a movement command from the server or a reset command
-            if server_data.bot_targets[peer_name] and not given_priority_target:
+            if server_data.bot_targets[peer_name]:
                 if server_data.bot_targets[peer_name] == 'r':
                     data['reboot'] = True
                 else:  # Means it's a coordinate
-                    low_priority_target = server_data.bot_targets[peer_name]
+                    data['target'] = server_data.bot_targets[peer_name]
                     server_data.bot_targets[peer_name] = ()
+                    given_priority_target = True
 
             if data['pos'] == data['target']:  # Target has been reached need new target
                 if given_priority_target:
@@ -168,7 +169,7 @@ def handle_cmd_client(conn, fernet, peer_name, server_data, img_sent):
                     server_data.bot_targets[bot] = move
 
             returning_data = {'bot_pos': server_data.bot_positions,
-                              'bad_blocks': server_data.bad_blocks[:3500]}
+                              'bad_blocks': server_data.bad_blocks[:2000]}
 
             encoded = fernet.encrypt(pickle.dumps(returning_data, protocol=-1))
             conn.send(encoded)

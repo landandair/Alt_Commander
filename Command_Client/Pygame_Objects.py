@@ -45,12 +45,15 @@ class BotPosIndicator(pg.sprite.Sprite):
         self.id = id
         self.size = size
         self.offset_to_pos = offset_to_pos
+        self.target = offset_to_pos(pos)
+        self.f_dpos = lambda dxy: 1/20 * dxy
         self.image = pg.surface.Surface([size, size], pg.SRCALPHA)
         pg.draw.circle(self.image, (color[0]/2, color[1]/2, color[2]/2), center=(size/2, size/2), radius=size/2)
         pg.draw.circle(self.image, color, center=(size/2, size/2), radius=size/3)
         self.image.convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.center = offset_to_pos(pos)
+        self.pos = list(offset_to_pos(pos))
+        self.rect.center = self.pos
 
     def update(self, bot_dict, bot_pos):
         color = self.color
@@ -62,7 +65,10 @@ class BotPosIndicator(pg.sprite.Sprite):
             else:
                 pg.draw.circle(self.image, (color[0]/2, color[1]/2, color[2]/2), center=(size/2, size/2), radius=size/2)
             self.image.convert_alpha()
-            self.rect.center = self.offset_to_pos(bot_pos[self.id])
+            self.target = self.offset_to_pos(bot_pos[self.id])
+            self.pos[0] += self.f_dpos(self.target[0]-self.pos[0])
+            self.pos[1] += self.f_dpos(self.target[1]-self.pos[1])
+            self.rect.center = self.pos
         else:  # Something went wrong
             bot_dict.pop(self.id)
             self.kill()
