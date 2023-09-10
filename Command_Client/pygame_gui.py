@@ -58,7 +58,7 @@ class Window:
         self.check_for_bad_blocks()
 
         self.bot_group.update(self.bot_dict, self.cmd_data.bot_positions)
-        self.bad_group.update(self.bad_list, self.cmd_data.bad_blocks)
+        self.bad_group.update(self.bad_list)
         self.ui_elements.update()
         self.selection_boxes.update()
         # display layer from bottom to top
@@ -70,7 +70,7 @@ class Window:
         self.ui_elements.draw(self.screen)
         self.selection_boxes.draw(self.screen)
         pg.display.flip()
-        self.clock.tick(60)
+        self.clock.tick(30)
 
     def manage_events(self):
         for event in pg.event.get():
@@ -115,12 +115,18 @@ class Window:
                 self.bot_group.add(bot)
 
     def check_for_bad_blocks(self):
-        if len(self.cmd_data.bad_blocks) != len(self.bad_list):
-            for pos in self.cmd_data.bad_blocks:
+        if self.cmd_data.new_blocks:
+            for pos in self.cmd_data.new_blocks:
                 if pos not in self.bad_list:
                     bad_block = Pygame_Objects.BadBlockIndicator(pos, self.abs_to_pos, self.pixel_size)
                     self.bad_list.append(pos)
                     self.bad_group.add(bad_block)
+            self.cmd_data.new_blocks = []
+        if self.cmd_data.remove_blocks:
+            for pos in self.cmd_data.remove_blocks:
+                if pos in self.bad_list:
+                    self.bad_list.remove(pos)
+            self.cmd_data.remove_blocks = []
 
     def select_bots(self):
         # Collide the box surface with the bot sprites to get the selected bots, add them to a list
@@ -137,7 +143,7 @@ class Window:
         abs_pos = self.pos_to_abs(pos)
         abs_pos = (round(abs_pos[0]), round(abs_pos[1]))
         for id in self.bot_dict:
-            if self.bot_dict[id]: # is the bot selected
+            if self.bot_dict[id]:  # is the bot selected
                 self.cmd_data.moves[id] = abs_pos
 
     def select_area(self):

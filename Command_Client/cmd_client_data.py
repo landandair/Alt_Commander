@@ -5,7 +5,8 @@ class CmdData:
         self.running = True
         self.booted = False
         self.bot_positions = {}
-        self.bad_blocks = []
+        self.remove_blocks = []
+        self.new_blocks = []
         self.goto_range = ()
         self.moves = {}
         self.shuffle = False

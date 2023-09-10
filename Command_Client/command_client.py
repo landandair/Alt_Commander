@@ -84,10 +84,12 @@ def start_cmd_client(cmd_client_data):
             returned = connection.send(data)
             if returned:
                 cmd_client_data.bot_positions = returned['bot_pos']
-                cmd_client_data.bad_blocks = returned['bad_blocks']
+                cmd_client_data.new_blocks = returned['new_bad_blocks']
+                cmd_client_data.remove_blocks = returned['removed_bad_blocks']
             else:
                 raise socket.error
     except socket.error as e:
+        print(e)
         cmd_client_data.running = False
         sys.exit(e)
 

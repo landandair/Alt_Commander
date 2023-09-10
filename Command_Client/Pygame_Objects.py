@@ -46,7 +46,7 @@ class BotPosIndicator(pg.sprite.Sprite):
         self.size = size
         self.offset_to_pos = offset_to_pos
         self.target = offset_to_pos(pos)
-        self.f_dpos = lambda dxy: 1/20 * dxy
+        self.f_dpos = lambda dxy: 1/10 * dxy
         self.image = pg.surface.Surface([size, size], pg.SRCALPHA)
         pg.draw.circle(self.image, (color[0]/2, color[1]/2, color[2]/2), center=(size/2, size/2), radius=size/2)
         pg.draw.circle(self.image, color, center=(size/2, size/2), radius=size/3)
@@ -88,17 +88,8 @@ class BadBlockIndicator(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = offset_to_pos(pos)
 
-    def update(self, list_accounted, bad_list):
-        color = self.color
-        size = self.size
-        if self.id in bad_list:  # bot is in server
-            # Bot is not selected
-            pg.draw.circle(self.image, (color[0]/2, color[1]/2, color[2]/2), center=(size/2, size/2), radius=size/2)
-            pg.draw.circle(self.image, color, center=(size/2, size/2), radius=size/3)
-            self.image.convert_alpha()
-            self.rect.center = self.offset_to_pos(self.id)
-        else:  # Something went wrong
-            list_accounted.remove(self.id)
+    def update(self, list_accounted):
+        if self.id not in list_accounted:  # bot is in server
             self.kill()
 
 
