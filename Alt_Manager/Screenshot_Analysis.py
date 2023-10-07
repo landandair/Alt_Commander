@@ -7,6 +7,7 @@ def make_dict_files(img: Image):
     white = (255, 255, 255)
     window_size = (800, 600)
     size = img.size
+    print(size)
     img_to_window = lambda pos: (pos[0] * window_size[0]//size[0], pos[1] * window_size[1]//size[1])
 
     """Find color button positions"""
@@ -89,10 +90,11 @@ def make_dict_files(img: Image):
     for x in range(top_left[0], bottom_right[0]+1):
         for y in range(top_left[1], bottom_right[1]+1):
             if (x, y) not in bad_offsets:
-                offset_to_pos[(x, y)] = img_to_window((center[0] + block_width*x, center[1] + block_width*y))
+                offset_to_pos[(x, y)] = (center[0] + block_width*x, center[1] + block_width*y)
                 if x == top_left[0] or x == bottom_right[0] or y == top_left[1] or y == bottom_right[1]:  # Border
                     offset_to_pos['border_moves'].append((x, y))
 
+    print(color_to_pos)
     print(offset_to_pos)
 
     with open('Dictionaries/button_pos.pickle', 'wb') as fi:
