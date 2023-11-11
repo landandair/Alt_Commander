@@ -4,8 +4,11 @@ Game/interface for Operating smarter bots for R/Place in a semi or fully-autonom
 Contents:
 - Installation instructions
   - Installing and starting standard
+  - Running a server
+  - Command Client
+  - 
 
-**Install Instructions:**
+**Install Instructions for Client:**
 - **Installing and Starting a Standard Client**
 1. Download python https://www.python.org/downloads/
 2. Run the executable installer for your os
@@ -50,31 +53,60 @@ Contents:
       1. Set up a port forward for the port in Server_data.txt
 6. Once you finish check your work
    1. https://www.portchecktool.com and type in port
-   2. Check ip to ensure it looks good(or proxy if you used a proxy instead of your public ip)
+   2. Check ip to ensure it looks good(or proxy if you used a proxy instead of your public ip which is recommended)
    3. Make sure it says "Success!"
-   4. Congrats you have made a hole in your firewall
+   4. Congrats you have made a hole in your firewall(Use a proxy or vpn if possible)
       1. (Consider turning this off after the event is done)
 7. Now share your Server_data.txt to the people who are joining
-   1. (maybe in a private channel with just the people who need it as it contains your encryption key for the server, your public ip, and the port you used)
+   1. Recommended: in a private channel with just the people who need it as it contains your encryption key for the server, your public ip to your server computer, and the port you used
 8. Modify the start server script to meet your needs
    1. Add desired template to /Server/Templates
       1. Needs to be a 1:1 png with the exact colors and a color not in the pallet for ignored areas of the square area
    2. Open the script modify the following
    3. corner_pos = (100, 100) 
       1. Where you want the top left corner of the image to go
-   4. file_name = 'Templates/daniil.png'
+   4. ignored_color = (R, G, B)
+      1. What RGB color you want the bots to ignore
+   5. file_name = 'Templates/daniil.png'
       1. Path to the image file
-9. Now congrats you should be able to have people join your hosted server as clients
-   1. They can join as either bots or managers
-   2. To run clients on the machine running the server ensure that the local variable is set to True as described above
+9. Run the server by running the start_server.py script
+10. Now congrats you should be able to have people join your hosted server as clients
+    1. They can join as either bots or managers
+    2. To run clients on the machine running the server ensure that the local variable is set to True as described above
 - **Installing and Starting a Command Client**
-1. Not Complete yet
-2. Follow the instructions to start a standard client
-3. Select if its in local mode or not
-   1. Open script and modify to local=True or local=False
-4. Run 'start_cmd_client.py', it should connect to the server and open the interface
-5. Controls are below
+1. Follow the instructions to start a standard client
+2. Select if its in local mode or not (Local is On server Machine)
+   1. Open start_cmd_client.py script and modify to local=True or local=False
+3. Run 'start_cmd_client.py', it should connect to the server and open the interface
+4. Controls are below:
+   1. select bots to manually control
+      1. left click and drag to select
+      2. Use Space bar after this to command those bots to go to the cursor position
+      3. This is best used for gaining inteligence to the central controller by directing a group of bots towards a sudden attack
+   2. Select area to prioritize attack/defend area
+      1. Right click and drag over area you want to defend/attack
+      2. Useful to coordinate bot spawn loctions and movement as this overwrites the default random shuffle with a predictable movement queue
+   3. Randomize check queue
+      1. Press r key
+      2. Useful to reset the queue to the default to return all the bots to a random patrol which is best for gaining inteligence for the central controller, so it has a faster response time
+   4. Further details are below
 
-**Detailed Instructions of How the Bots Behave and Can Be Controlled**
+**Description of How the Bots Behave and Can Be best Controlled**
 
-(TBD Once Cmd client is done)
+   * Movement system
+     * There are two kinds of movement commands
+       * High Priority: Bad pixels or direct commands which are unable to be changed until the command is completed
+       * Low Priority: The first blocks in the queue of pixels to be checked which is either random or set by the select area command
+     * Logic:
+       * The bots move from low priority to low priority target until they get ready to place
+       * If they get into the ready state, they head to the nearest bad block if one exists or go to the first one that comes into the queue if none are available
+       * Once placed they return going to the next low priority target in the queue
+     * Strategy:
+       * Initial Attack:
+         * Open the server and a command client before an initial attack and place a right click block select over the entire canvas to concentrate forces
+           * Useful to help humans identify the pattern and assist the bots instead of fighting them
+           * Reselect areas that show resistance if you have overwhelming force to ensure the bots dump pixels there
+       * Once the position is stable, and you have overwhelming force:
+         * Randomize the blocks in the queue
+         * If manual control is desired grab no more than a few in manual control and take them around the board
+           * This helps the central controller get locations of bad pixels to send bots too

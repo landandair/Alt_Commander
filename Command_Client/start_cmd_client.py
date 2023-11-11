@@ -12,7 +12,7 @@ import cmd_client_data
 
 
 def main():
-    local = True
+    local = True  # Change if running on a different machine than the one running the server
     cmd_data = cmd_client_data.CmdData(local_mode=local)
     try:
         # Start connection to server on other thread
