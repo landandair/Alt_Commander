@@ -38,7 +38,7 @@ Contents:
    2. click the run button to run the script
    3. If this doesnt work try using command prompt
    4. if you get Alert: Running in local mode cannot join a server please change if undesired
-      1. Look at the open 'start_alts.py' script and change local=True to local=False
+      1. Look at the open 'Alt_config.ini' file and change local=True to local=False
 - **Starting a Server**
 1. Follow instructions for the client
    1. (minus getting the server data and running it)
@@ -62,10 +62,10 @@ Contents:
 8. Modify the start server script to meet your needs
    1. Add desired template to /Server/Templates
       1. Needs to be a 1:1 png with the exact colors and a color not in the pallet for ignored areas of the square area
-   2. Open the script modify the following
-   3. corner_pos = (100, 100) 
+   2. Open the config file and modify the following
+   3. corner_x, corner_y
       1. Where you want the top left corner of the image to go
-   4. ignored_color = (R, G, B)
+   4. ignored_color_R, ignored_color_G, ignored_color_B
       1. What RGB color you want the bots to ignore
    5. file_name = 'Templates/daniil.png'
       1. Path to the image file
@@ -76,7 +76,7 @@ Contents:
 - **Installing and Starting a Command Client**
 1. Follow the instructions to start a standard client
 2. Select if its in local mode or not (Local is On server Machine)
-   1. Open start_cmd_client.py script and modify to local=True or local=False
+   1. Open cmd_config.ini config file and modify to local=True or local=False
 3. Run 'start_cmd_client.py', it should connect to the server and open the interface
 4. Controls are below:
    1. select bots to manually control
@@ -109,4 +109,4 @@ Contents:
        * Once the position is stable, and you have overwhelming force:
          * Randomize the blocks in the queue
          * If manual control is desired grab no more than a few in manual control and take them around the board
-           * This helps the central controller get locations of bad pixels to send bots too
+           * This helps the central controller get locations of bad pixels to send bots to

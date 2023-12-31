@@ -5,17 +5,20 @@ from PIL import Image
 import bot_interface
 import alt_client
 from threading import Thread
+import configparser
+
 def main():
-    local = True
+    config = configparser.ConfigParser()
+    config.read('Alt_config.ini')
+    local = config.getboolean('Settings', 'local')
     if local:
         print('Alert: Running in local mode cannot join a server please change if undesired')
-    fake_client = True
-    account_info = 'Account_Info.txt'
+    fake_client = config.getboolean('Settings', 'fake_client')
+    account_info = config.get('Settings', 'account_info')
     if fake_client:
-        account_info = 'Example_Account_Info.txt'
         image = Image.open(os.getcwd() + '/screenshots/game_board.png')
     info = [True]
-    allowed_fails = 10  # -1 means infinite restarts (Not recommended)
+    allowed_fails = config.getint('Settings', 'allowed_fails')
     processes = []
     try:
         with open(account_info) as fi:

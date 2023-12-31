@@ -2,7 +2,7 @@ import socket
 import sys
 import time
 from threading import Thread
-
+import configparser
 import pygame
 
 from command_client import start_cmd_client
@@ -12,7 +12,9 @@ import cmd_client_data
 
 
 def main():
-    local = True  # Change if running on a different machine than the one running the server
+    config = configparser.ConfigParser()
+    config.read('cmd_config.ini')
+    local = config.getboolean('Settings', 'local')
     cmd_data = cmd_client_data.CmdData(local_mode=local)
     try:
         # Start connection to server on other thread
