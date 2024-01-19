@@ -3,7 +3,6 @@ import socket
 import pickle
 import sys
 from cryptography.fernet import Fernet, InvalidToken
-import Server.Server_Client_Data
 
 
 class CmdNetwork:
