@@ -116,7 +116,7 @@ class Window:
                 self.bot_group.add(bot)
 
     def check_for_bad_blocks(self):
-        if self.cmd_data.new_blocks:
+        if self.cmd_data.new_blocks and self.cmd_data.show_bad:
             for pos in self.cmd_data.new_blocks:
                 if pos not in self.bad_list:
                     bad_block = Pygame_Objects.BadBlockIndicator(pos, self.abs_to_pos, self.pixel_size)

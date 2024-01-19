@@ -15,7 +15,9 @@ def main():
     config = configparser.ConfigParser()
     config.read('cmd_config.ini')
     local = config.getboolean('Settings', 'local')
+    show_bad = config.getboolean('Settings', 'display_bad')
     cmd_data = cmd_client_data.CmdData(local_mode=local)
+    cmd_data.show_bad = show_bad
     try:
         # Start connection to server on other thread
         arg = [cmd_data]

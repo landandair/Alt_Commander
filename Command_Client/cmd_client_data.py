@@ -12,3 +12,4 @@ class CmdData:
         self.shuffle = False
         self.reboot = False
         self.health = 0  # % missing integer
+        self.show_bad = True

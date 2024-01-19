@@ -9,6 +9,28 @@ class Background(pg.sprite.Sprite):
         self.rect.center = center
 
 
+class SelectionBox(pg.sprite.Sprite):
+    def __init__(self, corner, color=(200, 200, 200)):
+        super().__init__()
+        self.pos = corner
+        self.color = color
+        self.image = pg.surface.Surface([100, 1])
+        self.image.set_alpha(100)
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.center = corner
+
+    def update(self):
+        new_corner = pg.mouse.get_pos()
+        size = [self.pos[0]-new_corner[0], self.pos[1]-new_corner[1]]
+        center = ((self.pos[0] + new_corner[0])/2, (self.pos[1] + new_corner[1])/2)
+        self.image = pg.transform.scale(self.image, (abs(size[0]), abs(size[1])))
+        self.image.fill(self.color)
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+
+
+
 class BotPosIndicator(pg.sprite.Sprite):
     def __init__(self, id, pos, offset_to_pos, size, color=(0, 255, 0)):
         super().__init__()
