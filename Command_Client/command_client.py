@@ -82,6 +82,7 @@ def start_cmd_client(cmd_client_data):
                 cmd_client_data.reboot = False
             returned = connection.send(data)
             if returned:
+                cmd_client_data.health = returned['health']
                 cmd_client_data.bot_positions = returned['bot_pos']
                 cmd_client_data.new_blocks = returned['new_bad_blocks']
                 cmd_client_data.remove_blocks = returned['removed_bad_blocks']

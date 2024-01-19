@@ -11,3 +11,4 @@ class CmdData:
         self.moves = {}
         self.shuffle = False
         self.reboot = False
+        self.health = 0  # % missing integer

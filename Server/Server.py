@@ -179,9 +179,11 @@ def handle_cmd_client(conn, fernet, peer_name, server_data, img_sent):
                 if block not in server_data.bad_blocks:
                     blocks_to_remove.append(block)
                     bad_blocks_sent.remove(block)
+            health = round(len(server_data.bad_blocks)/len(server_data.update_blocks)*100)
             returning_data = {'bot_pos': server_data.bot_positions,
                               'new_bad_blocks': blocks_to_send,
-                              'removed_bad_blocks': blocks_to_remove}
+                              'removed_bad_blocks': blocks_to_remove,
+                              'health': health}
 
             encoded = fernet.encrypt(pickle.dumps(returning_data, protocol=-1))
             conn.send(encoded)

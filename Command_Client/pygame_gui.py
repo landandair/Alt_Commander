@@ -47,6 +47,7 @@ class Window:
         # Ui
         self.ui_elements = pg.sprite.Group()
         self.selection_boxes = pg.sprite.Group()
+        self.ui_elements.add(Pygame_Objects.ActiveText((10, 10)))
 
         # Misc Vars
         self.clock = pg.time.Clock()
@@ -59,7 +60,7 @@ class Window:
 
         self.bot_group.update(self.bot_dict, self.cmd_data.bot_positions)
         self.bad_group.update(self.bad_list)
-        self.ui_elements.update()
+        self.ui_elements.update(self.cmd_data.health)
         self.selection_boxes.update()
         # display layer from bottom to top
         self.screen.fill((40, 40, 40))
