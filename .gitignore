@@ -2,3 +2,4 @@
 /Server_data.txt
 /Alt_Manager/template_img.png
 /Command_Client/template_img.png
+*/__pycache__/
